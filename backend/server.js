@@ -6,6 +6,7 @@ const app = express();
 const userRoutes = require("./routes/userRoutes");
 const movieRoutes = require("./routes/movieRoutes");
 const genreRoutes = require("./routes/genreRoutes");
+const watchlistRoutes = require("./routes/watchlistRoutes");
 const helmet = require("helmet");
 
 // Load env variables
@@ -13,13 +14,16 @@ dotenv.config();
 // Connect to MongoDB
 connectDB();
 
+// Middleware
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
+// Routes
 app.use("/api/users", userRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/genres", genreRoutes);
+app.use("/api/watchlist", watchlistRoutes);
 
 const PORT = process.env.PORT || 5000;
 

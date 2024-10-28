@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 import "./MovieCard.css";
 
-const MovieCard = ({ movie }) => {
+const MovieCard = ({ movie, showDeleteButton, onDelete }) => {
   const [showDetails, setShowDetails] = useState(false);
 
   const handleCardClick = () => {
@@ -12,6 +14,39 @@ const MovieCard = ({ movie }) => {
   const handleOverlayClick = (e) => {
     // Prevent card click event from firing when overlay is clicked
     e.stopPropagation();
+  };
+
+  const handleAddToWatchlist = async () => {
+    try {
+      await axios.post(
+        "/api/watchlist",
+        {
+          movieId: movie.id,
+          title: movie.title || movie.name,
+          posterPath: movie.poster_path,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+        }
+      );
+      toast.success("Movie added to watchlist!");
+    } catch (error) {
+      console.error("Error adding movie to watchlist: ", error);
+      if (error.response && error.response.status === 400) {
+        // Movie already in watchlist
+        toast.info("Movie is already in your watchlist.");
+      } else {
+        toast.error("Error adding movie to watchlist. Please try again.");
+      }
+    }
+  };
+
+  const handleDeleteFromWatchlist = () => {
+    if (onDelete) {
+      onDelete(movie._id);
+    }
   };
 
   return (
@@ -30,17 +65,33 @@ const MovieCard = ({ movie }) => {
         <div className="movie-card-overlay" onClick={handleOverlayClick}>
           <div className="movie-card-overlay-content">
             <p>
-              <strong>Rating:</strong> {movie.vote_average.toFixed(1)}
+              <strong>Rating:</strong> {""}
+              {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"}
             </p>
             <p>
               <strong>Release Date:</strong>{" "}
-              {movie.release_date || movie.first_air_date}
+              {movie.release_date || movie.first_air_date || "Unknown"}
             </p>
             <p>
-              <strong>Overview:</strong> {movie.overview}
+              <strong>Overview:</strong>{" "}
+              {movie.overview || "No overview available."}
             </p>
-            {/* Placeholder for Add to Watchlist button */}
-            <button className="btn-add-watchlist">Add to Watchlist</button>
+            {!showDeleteButton && (
+              <button
+                className="btn-add-watchlist"
+                onClick={handleAddToWatchlist}
+              >
+                Add to Watchlist
+              </button>
+            )}
+            {showDeleteButton && (
+              <button
+                className="btn-delete-watchlist"
+                onClick={handleDeleteFromWatchlist}
+              >
+                Delete from Watchlist
+              </button>
+            )}
             <button
               className="btn-close-overlay"
               onClick={() => setShowDetails(false)}

@@ -49,7 +49,7 @@ const HomePage = () => {
     ) {
       validationErrors.year = "Please enter a valid year after 1900.";
     }
-
+    // Validate rating
     if (rating && (isNaN(rating) || rating < 0 || rating > 10)) {
       validationErrors.rating = "Please enter a valid rating between 0 and 10.";
     }

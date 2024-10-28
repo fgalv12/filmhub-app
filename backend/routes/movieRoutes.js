@@ -2,7 +2,12 @@ const express = require("express");
 const axios = require("axios");
 const router = express.Router();
 const { query, validationResult } = require("express-validator");
+const { protect } = require("../middleware/authMiddleware");
+const dotenv = require("dotenv");
 
+dotenv.config();
+
+// Get search results
 router.get(
   "/home",
   [
@@ -30,7 +35,7 @@ router.get(
         include_adult: false,
         page: 1,
       };
-
+      // Set API URL and params based on search query
       if (searchQuery) {
         // Use search API if query is provided
         apiURL = "https://api.themoviedb.org/3/search/movie";
@@ -82,5 +87,36 @@ router.get(
     }
   }
 );
+
+// Get movie details
+router.get("/details/:movieId", protect, async (req, res) => {
+  const { movieId } = req.params;
+
+  // Fetch movie details from TMDb
+  try {
+    const apiKey = process.env.TMDB_API_KEY;
+
+    // Fetch movie details from TMDb
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/movie/${movieId}`,
+      {
+        params: {
+          api_key: apiKey,
+          language: "en-US",
+          append_to_response: "videos",
+        },
+      }
+    );
+    // Send movie details to the client
+    res.json(response.data);
+  } catch (error) {
+    console.error("Error fetching movie details: ", error.message);
+    if (error.response && error.response.status === 404) {
+      res.status(404).json({ message: "Movie not found" });
+    } else {
+      res.status(500).json({ message: "Error fecthing movie details." });
+    }
+  }
+});
 
 module.exports = router;

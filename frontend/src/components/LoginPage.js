@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../contexts/AuthContext";
 import "./LoginPage.css";
 
 const LoginPage = () => {
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -13,19 +15,31 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/users/login", {
-        email,
-        password,
-      });
-      console.log("Login successful:", res.data);
+      const { data } = await axios.post(
+        "http://localhost:5000/api/users/login",
+        {
+          email,
+          password,
+        }
+      );
 
-      setMessage("Login successful");
-      setMessageType("success");
+      if (data.token) {
+        // Login function from AuthContext
+        login(data.token);
 
-      // Redirect to home page after successful login
-      setTimeout(() => {
-        navigate("/home");
-      }, 1500);
+        console.log("Login successful");
+        setMessage("Login successful");
+        setMessageType("success");
+
+        // Redirect to home page after successful login
+        setTimeout(() => {
+          navigate("/home");
+        }, 1500);
+      } else {
+        console.error("No token received in login response");
+        setMessage("Login failed. No token received.");
+        setMessageType("error");
+      }
     } catch (error) {
       if (
         error.response &&

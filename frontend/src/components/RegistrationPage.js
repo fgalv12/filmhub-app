@@ -43,14 +43,16 @@ const RegistrationPage = () => {
     }
 
     try {
-      const res = await axios.post("http://localhost:5000/api/users/register", {
+      // Send registration data to the backend
+      await axios.post("http://localhost:5000/api/users/register", {
         firstName,
         lastName,
         email,
         password,
       });
-      console.log("Registration successful:", res.data);
-      setMessage("Registration successful");
+
+      console.log("Registration successful");
+      setMessage("Registration successful. Please log in.");
       setMessageType("success");
 
       // Redirect to login page after successful registration
@@ -70,12 +72,12 @@ const RegistrationPage = () => {
         setMessage("An error occurred. Please try again later.");
       }
       setMessageType("error");
-    }
 
-    setTimeout(() => {
-      setMessage("");
-      setMessageType("");
-    }, 5000);
+      setTimeout(() => {
+        setMessage("");
+        setMessageType("");
+      }, 5000);
+    }
   };
 
   return (
