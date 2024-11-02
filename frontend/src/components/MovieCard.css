@@ -41,30 +41,49 @@
 }
 
 .movie-card-overlay-content {
-  text-align: center;
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.7rem;
+  gap: 0.3rem;
 }
 
 .movie-card-overlay p {
-  margin: 0.5rem 0;
+  margin: 0;
   font-size: 0.9rem;
-  text-align: left;
+  text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 7;
+  -webkit-line-clamp: 6;
   -webkit-box-orient: vertical;
-  line-clamp: 7;
+  line-clamp: 6;
+}
+
+.trailer {
+  color: #1e90ff;
+  font-weight: bold;
+  text-decoration: underline;
+  font-size: 0.9rem;
+}
+
+.trailer:hover {
+  color: #63a4ff;
+}
+
+.btn-add-watchlist,
+.btn-delete-watchlist,
+.btn-close-overlay {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 0.3rem;
+  color: #fff;
 }
 
 .btn-add-watchlist {
-  padding: 0.5rem 1rem;
   background-color: #28a745;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
 }
 
 .btn-add-watchlist:hover {
@@ -72,12 +91,7 @@
 }
 
 .btn-delete-watchlist {
-  padding: 0.5rem 1rem;
   background-color: #dc3545;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
 .btn-delete-watchlist:hover {
@@ -90,23 +104,26 @@
   right: 0.7rem;
   padding: 0.3rem;
   background-color: #dc3545;
-  color: #fff;
-  border: none;
-  border-radius: 2px;
-  cursor: pointer;
 }
 
 .btn-close-overlay:hover {
   background-color: #c82333;
 }
 
-/* @media (max-width: 600px) {
-  .movie-card {
-    width: 150px;
-    height: 250px;
+@media (max-width: 600px) {
+  .movie-card-overlay-content {
+    padding: 0.7rem;
+    gap: 0rem;
   }
 
-  .movie-card-image {
-    height: 200px;
+  .trailer {
+    margin-bottom: 0.3rem;
+    font-size: 0.8rem;
   }
-} */
+
+  .btn-add-watchlist,
+  .btn-delete-watchlist,
+  .btn-close-overlay {
+    padding: 0.4rem 0.8rem;
+  }
+}

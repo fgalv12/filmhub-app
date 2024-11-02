@@ -29,50 +29,46 @@ const HomePage = () => {
   }, []);
 
   useEffect(() => {
+    // Clear search results when the search criteria changes
     if (!query || !year || !rating || !genre) {
       setResults([]);
     }
   }, [query, year, rating, genre]);
 
-  // Handle search form submission
-  const handleSearch = async (e) => {
-    e.preventDefault();
-    setHasSearched(true);
-    setLoading(true);
-
-    let validationErrors = {};
-
-    // Input validation
-    if (
-      year &&
-      (isNaN(year) || year < 1900 || year > new Date().getFullYear())
-    ) {
-      validationErrors.year = "Please enter a valid year after 1900.";
+  // Validate inputs before submitting the search form
+  const validateInputs = () => {
+    const errors = {};
+    // Validate inputs
+    if (query.trim().length > 100) {
+      errors.query = "Title must be 100 characters or less.";
+    }
+    // Validate year
+    if (year) {
+      const currentYear = new Date().getFullYear();
+      if (isNaN(year)) {
+        errors.year = "Year must be a number.";
+      } else if (year < 1900 || year > currentYear) {
+        errors.year = `Year must be between 1900 and ${currentYear}.`;
+      }
     }
     // Validate rating
-    if (rating && (isNaN(rating) || rating < 0 || rating > 10)) {
-      validationErrors.rating = "Please enter a valid rating between 0 and 10.";
+    if (rating) {
+      if (isNaN(rating)) {
+        errors.rating = "Rating must be a number.";
+      } else if (rating < 0 || rating > 10) {
+        errors.rating = "Rating must be between 0 and 10.";
+      }
     }
 
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      setLoading(false);
-      return;
-    }
+    return errors;
+  };
 
-    setErrors({});
-
-    // Fetch search results from the backend
+  // Fetch search results from the backend
+  const fetchSearchResults = async (params) => {
     try {
-      const res = await axios.get("/api/movies/home", {
-        params: {
-          query: query.replace("*", "%"),
-          year,
-          rating,
-          genre,
-        },
-      });
-      setResults(res.data);
+      const response = await axios.get("/api/movies/home", { params });
+      setResults(response.data);
+      // Catch any errors
     } catch (error) {
       if (error.response && error.response.status === 429) {
         alert(
@@ -86,37 +82,81 @@ const HomePage = () => {
     }
   };
 
+  // Handle search form submission
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    setHasSearched(true);
+    setLoading(true);
+    // Validate inputs
+    const validationErrors = validateInputs();
+
+    // Display validation errors if any
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      setLoading(false);
+      return;
+    }
+    // Clear previous errors
+    setErrors({});
+
+    // Prepare search parameters
+    const searchParams = {
+      query: query ? query.replace("*", "%") : undefined,
+      year: year || undefined,
+      rating: rating || undefined,
+      genre: genre || undefined,
+    };
+
+    // Fetch search results
+    await fetchSearchResults(searchParams);
+  };
+
   return (
     <div className="home-page">
       <h2>Home</h2>
-      <p>Search your next movie and TV show!</p>
+      <p>Search your next movie! Search by title or year, rating, and genre.</p>
       <form className="search-form" onSubmit={handleSearch}>
         <div className="form-control">
-          <label>Title:</label>
+          <label htmlFor="title">Title:</label>
           <input
             type="text"
+            id="title"
+            name="title"
+            maxLength="100"
             placeholder="Search title"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
           {errors.query && (
-            <small className="text-danger">{errors.query}</small>
+            <small id="title-error" className="text-danger">
+              {errors.query}
+            </small>
           )}
         </div>
         <div className="form-control">
-          <label>Year:</label>
+          <label htmlFor="year">Year:</label>
           <input
             type="number"
+            id="year"
+            name="year"
+            min="1900"
+            max={new Date().getFullYear()}
             placeholder="Search by year"
             value={year}
             onChange={(e) => setYear(e.target.value)}
           />
-          {errors.year && <small className="text-danger">{errors.year}</small>}
+          {errors.year && (
+            <small id="year-error" className="text-danger">
+              {errors.year}
+            </small>
+          )}
         </div>
         <div className="form-control">
-          <label>Rating:</label>
+          <label htmlFor="rating">Rating:</label>
           <input
             type="number"
+            id="rating"
+            name="rating"
             step="0.1"
             max="10"
             min="0"
@@ -125,13 +165,17 @@ const HomePage = () => {
             onChange={(e) => setRating(e.target.value)}
           />
           {errors.rating && (
-            <small className="text-danger">{errors.rating}</small>
+            <small id="rating-error" className="text-danger">
+              {errors.rating}
+            </small>
           )}
         </div>
         <div className="form-control">
-          <label>Genre:</label>
+          <label htmlFor="genre">Genre:</label>
           <select
             className="form-control-item"
+            id="genre"
+            name="genre"
             title="Select Genre"
             value={genre}
             onChange={(e) => setGenre(e.target.value)}
@@ -144,9 +188,11 @@ const HomePage = () => {
             ))}
           </select>
         </div>
-        <button className="btn-search" type="submit">
-          Search
-        </button>
+        <div className="search-container">
+          <button className="btn-search" type="submit" disabled={loading}>
+            {loading ? "Searching..." : "Search"}
+          </button>
+        </div>
       </form>
 
       <div className="search-results">
@@ -164,6 +210,10 @@ const HomePage = () => {
           </div>
         )}
       </div>
+      <div className="notice">
+        This product uses the TMDB API but is not endorsed or certified by TMDB.
+      </div>
+      <img className="logo" src="/tmdb_logo.svg" alt="TMDB Logo" />
     </div>
   );
 };

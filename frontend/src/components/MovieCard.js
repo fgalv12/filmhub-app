@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "./MovieCard.css";
 
 const MovieCard = ({ movie, showDeleteButton, onDelete }) => {
   const [showDetails, setShowDetails] = useState(false);
+  const [videos, setVideos] = useState([]);
+  const [loadingVideos, setLoadingVideos] = useState(false);
 
   const handleCardClick = () => {
     // Toggle showDetails state
@@ -15,6 +17,30 @@ const MovieCard = ({ movie, showDeleteButton, onDelete }) => {
     // Prevent card click event from firing when overlay is clicked
     e.stopPropagation();
   };
+
+  // Fetch movie videos when showDetails is true
+  useEffect(() => {
+    const fetchVideos = async () => {
+      if (showDetails && videos.length === 0) {
+        setLoadingVideos(true);
+        try {
+          const response = await axios.get(`/api/movies/details/${movie.id}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+          });
+          setVideos(response.data.videos.results);
+        } catch (error) {
+          console.error("Error fetching movie videos: ", error);
+          toast.error("Failed to load trailer. Please try again.");
+        } finally {
+          setLoadingVideos(false);
+        }
+      }
+    };
+
+    fetchVideos();
+  }, [showDetails, movie.id, videos.length]);
 
   const handleAddToWatchlist = async () => {
     try {
@@ -76,6 +102,20 @@ const MovieCard = ({ movie, showDeleteButton, onDelete }) => {
               <strong>Overview:</strong>{" "}
               {movie.overview || "No overview available."}
             </p>
+            {loadingVideos ? (
+              <p>Loading trailer...</p>
+            ) : videos.length > 0 ? (
+              <a
+                className="trailer"
+                href={`https://www.youtube.com/watch?v=${videos[0].key}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Watch Trailer
+              </a>
+            ) : (
+              <p>No trailer available.</p>
+            )}
             {!showDeleteButton && (
               <button
                 className="btn-add-watchlist"

@@ -1,11 +1,11 @@
 .watchlist-page {
-  /* padding: 20px; */
   max-width: 1500px;
   margin: 2rem auto;
   padding: 2rem;
   background-color: #fff;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
 }
 
 .watchlist-page h2 {
@@ -18,6 +18,7 @@
   border-collapse: collapse;
   margin-top: 2rem;
   table-layout: auto;
+  overflow-x: auto;
 }
 
 .watchlist-table th,
@@ -25,11 +26,48 @@
   background-color: #f8f9fa;
   border-bottom: 2px solid #dee2e6;
   border: 1px solid #dee2e6;
-  padding: 1rem;
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  text-align: center;
 }
 
 .watchlist-table th {
-  padding: 0.5rem;
-  text-align: center;
   background-color: #f2f2f2;
+}
+
+@media screen and (max-width: 600px) {
+  .watchlist-page {
+    padding: 1rem;
+  }
+
+  .watchlist-table th,
+  .watchlist-table td {
+    font-size: 0.8rem;
+    padding: 0.4rem;
+  }
+
+  .movie-info {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .movie-poster {
+    width: 80px;
+    margin-bottom: 5px;
+  }
+
+  textarea {
+    width: 100px;
+  }
+
+  .btn-save,
+  .btn-delete {
+    width: 100%;
+  }
+
+  .movie-description {
+    max-width: 100%;
+    margin-bottom: 10px;
+  }
 }

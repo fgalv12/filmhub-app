@@ -8,6 +8,7 @@ const WatchlistPage = () => {
   const [watchlist, setWatchlist] = useState([]);
 
   useEffect(() => {
+    // Function to fetch the watchlist data from the backend
     const fetchWatchlist = async () => {
       try {
         // Fetch watchlist data from the backend
@@ -49,6 +50,7 @@ const WatchlistPage = () => {
     fetchWatchlist();
   }, []);
 
+  // Function to delete a movie from the watchlist
   const handleDelete = async (id) => {
     try {
       await axios.delete(`/api/watchlist/${id}`, {
@@ -69,6 +71,7 @@ const WatchlistPage = () => {
     }
   };
 
+  // Function to update a movie in the watchlist
   const handleUpdate = async (id, updatedData) => {
     try {
       const res = await axios.put(`/api/watchlist/${id}`, updatedData, {
@@ -90,6 +93,7 @@ const WatchlistPage = () => {
     }
   };
 
+  // Sort the watchlist by priority
   const sortedWatchlist = [...watchlist].sort(
     (a, b) => a.priority - b.priority
   );

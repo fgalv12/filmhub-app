@@ -13,7 +13,10 @@ router.get(
   [
     // Validate and sanitize query parameters
     query("query").optional().trim().escape(),
-    query("year").optional().isNumeric().toInt(),
+    query("year")
+      .optional()
+      .isNumeric()
+      .toInt({ min: 1900, max: new Date().getFullYear() }),
     query("rating").optional().isFloat({ min: 0, max: 10 }).toFloat(),
     query("genre").optional().isNumeric().toInt(),
   ],
@@ -35,18 +38,17 @@ router.get(
         include_adult: false,
         page: 1,
       };
-      // Set API URL and params based on search query
+      // Determine which API to use based on query
       if (searchQuery) {
         // Use search API if query is provided
         apiURL = "https://api.themoviedb.org/3/search/movie";
-        params.query = searchQuery.replace("*", "%");
+        params.query = searchQuery;
       } else {
         // Use discover API if no query is provided
         apiURL = "https://api.themoviedb.org/3/discover/movie";
-        // params.sort_by = "popularity.desc";
       }
 
-      // Add filters to params
+      // Add filters to params if provided
       if (year) {
         params.primary_release_year = year;
       }

@@ -7,7 +7,7 @@ const LandingPage = () => {
   return (
     <div className="landing-page">
       <h1>Welcome to FilmHub</h1>
-      <p>Explore movies and TV shows to start building your watchlist!</p>
+      <p>Explore movies to start building your watchlist!</p>
       <div className="landing-buttons">
         <Link to="/login">
           <Button className="btn">Login</Button>
